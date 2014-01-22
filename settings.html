@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="/js/hue.js"></script>
+
+    <script>
+        /*var locatedHubs;
+        var locatedLights;
+
+
+        function locateHubs() {
+            var xmlhttp;
+
+            if (window.XMLHttpRequest)
+            {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            }
+            else
+            {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function()
+            {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    locatedHubs = JSON.parse(xmlhttp.responseText);
+
+                    var hubListHtml = "";
+
+                    for (i = 0; i < locatedHubs.length; i++) {
+                        hubListHtml += "<li>" + locatedHubs[i].internalipaddress + "</li>";
+                    }
+
+                    document.getElementById("hubList").innerHTML = hubListHtml;
+                }
+            }
+            xmlhttp.open("GET","http://www.meethue.com/api/nupnp",true);
+            xmlhttp.send();
+        }
+
+        function connectToFirstHub() {
+            var xmlhttp;
+
+            if (window.XMLHttpRequest)
+            {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            }
+            else
+            {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function()
+            {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    var response = JSON.parse(xmlhttp.responseText);
+
+                    alert(xmlhttp.responseText);
+
+                    // Possibility for more than one error...
+                    if (response[0].error != null) {
+                        document.getElementById("registerResponse").innerHTML = response[0].error.description;
+                    } else {
+                        document.getElementById("registerResponse").innerHTML = "Success!";
+                    }
+                }
+            }
+
+            var message = JSON.stringify({"devicetype":"LAMP for Pebble"})
+            xmlhttp.open("POST", "http://" + locatedHubs[0].internalipaddress + "/api",true);
+
+            xmlhttp.send(message);
+        }
+
+        function getLights() {
+            var xmlhttp;
+
+            if (window.XMLHttpRequest)
+            {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            }
+            else
+            {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function()
+            {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    locatedLights = JSON.parse(xmlhttp.responseText);
+
+                    var lightListHtml = "";
+
+                    for (i = 1; i < 50; i++) {
+                        if (locatedLights[i] == null) {
+                            break;
+                        }
+                        lightListHtml += "<li>" + locatedLights[i].name + "</li>";
+                    }
+
+                    document.getElementById("lightList").innerHTML = lightListHtml;
+                }
+            }
+            xmlhttp.open("GET", "http://" + locatedHubs[0].internalipaddress + "/api/lamptestuser/lights",true);
+            xmlhttp.send();
+        }
+
+        function turnFirstOff() {
+            var xmlhttp;
+
+            if (window.XMLHttpRequest)
+            {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            }
+            else
+            {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function()
+            {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    var response = JSON.parse(xmlhttp.responseText);
+
+                    alert(xmlhttp.responseText);
+                    // Possibility for more than one error...
+                    //if (response[0].error != null) {
+                    //    document.getElementById("registerResponse").innerHTML = response[0].error.description;
+                    //} else {
+                    //    document.getElementById("registerResponse").innerHTML = "Success!";
+                    //}
+                }
+            }
+
+            var message = JSON.stringify({"on":true})
+            xmlhttp.open("PUT", "http://" + locatedHubs[0].internalipaddress + "/api/lamptestuser/lights/1/state",true);
+
+            xmlhttp.send(message);
+        }*/
+    </script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css" media="all" />
+</head>
+<body>
+    <!--<button type="button" onclick="locateHubs()">Locate hubs</button>
+    <ul id="hubList">
+    </ul>
+    <hr />
+    <button type="button" onclick="connectToFirstHub()">Register with first hub</button>
+    <div id="registerResponse">
+    </div>
+    <hr />
+    <button type="button" onclick="getLights()">Get lights</button>
+    <ul id="lightList">
+    </ul>
+    <hr />
+    <button type="button" onclick="turnFirstOff()">Turn light 1 off</button>-->
+
+    <div class="appHeader">
+        <div class="backArrow startHidden" id="backArrow">
+            <
+        </div>
+        L.A.M.P.
+    </div>
+    <div id="window_setupConnection_1" class="startHidden">
+        <h1>Welcome to the L.A.M.P. configuration</h1>
+        <p>
+            It appears that this is the first time you launch L.A.M.P. Follow the steps and I will guide you through the process.
+        </p>
+        <div class="window_buttons">
+            <div id="button_setupConnection_1_next">Next</div>
+        </div>
+    </div>
+    <div id="window_setupConnection_2" class="startHidden">
+        <h1>Connecting with your Hue hub</h1>
+        <p>
+            First we need to connect with your hub. You do this by pressing the connect button below and the center button on your hub.
+        </p>
+        <p>
+            The order doesn't matter, just make sure you press both buttons within 30 seconds.
+        </p>
+        <div id="button_register_hub">
+            Connect
+        </div>
+        <div id="window_waitingforhub" class="startHidden">
+            Waiting for the hub button to be pressed...
+        </div>
+    </div>
+    <div id="window_setupConnection_3" class="startHidden">
+        <h1>Succesfully connected to the hub!</h1>
+        <p>
+            We have successfully set up a connection! Press the next button to configure your lights, groups and blueprints. Have fun!
+        </p>
+        <div class="window_buttons">
+            <div id="button_setupConnection_3_next">Next</div>
+        </div>
+    </div>
+
+    <div id="window_lights" class="startHidden">
+        <ul id="lightsList" class="lamps">
+            <li>Loading...</li>
+        </ul>
+    </div>
+
+    <div id="window_connection" class="startHidden">
+        <div class="menuItem" id="menuItem_ResetConnection">
+            <div class="menuArrow">
+                >
+            </div>
+            Reset
+        </div>
+    </div>
+
+    <div id="window_groups" class="startHidden">
+        <ul id="groupList" class="groups">
+            <li>Loading...</li>
+        </ul>
+        <div id="addNewGroup">
+            Add new group
+        </div>
+        <div id="addNewGroupPanel" class="startHidden">
+            <input type="text" class="field" id="tbAddNewGroup" />
+            <div class='save' id="saveNewGroup">save</div>
+        </div>
+        <div id="clearGroups">
+            Delete all groups
+        </div>
+    </div>
+
+    <div id="window_editGroupLights" class="startHidden">
+        <div class="separator">
+            In this group (click to remove)
+        </div>
+        <ul id="groupLightsIncludedList" class="groupLights">
+            <li>Loading...</li>
+        </ul>
+        <div class="separator">
+            Not in this group (click to add)
+        </div>
+        <ul id="groupLightsExcludedList" class="groupLights">
+            <li>Loading...</li>
+        </ul>
+    </div>
+
+    <div id="window_mainMenu" class="startHidden">
+        <div class="menuItem" id="menuItem_lights">
+            <div class="menuArrow">
+                >
+            </div>
+            Lights
+        </div>
+        <div class="menuItem" id="menuItem_groups">
+            <div class="menuArrow">
+                >
+            </div>
+            Groups
+        </div>
+        <div class="menuItem">
+            <div class="menuArrow">
+                >
+            </div>
+            Blueprints
+        </div>
+        <div class="menuItem">
+            <div class="menuArrow">
+                >
+            </div>
+            Presets
+        </div>
+        <div class="menuItem" id="menuItem_connection">
+            <div class="menuArrow">
+                >
+            </div>
+            Connection
+        </div>
+    </div>
+
+    <span id="textLabel"></span>
+
+    <script>
+        // vars
+        var discoveredBridges = new Array();
+
+        // TODO:
+        // At launch check app version (in call url), if version mismatch then redirect users to the store
+        // What do we do with iOS users who won't be able to update instantly?
+
+
+        // temp: clear config
+        //localStorage.clear();
+
+        // At launch, we check if there is a lamp configuration set
+        if (window.localStorage.lampConfiguration && JSON.parse(window.localStorage.lampConfiguration).bridgeIp && JSON.parse(window.localStorage.lampConfiguration).bridgeId && JSON.parse(window.localStorage.lampConfiguration).bridgeUsername) {
+            // Configuration is available and complete (as far as the bridge connection concerns)
+            $('#window_mainMenu').show();
+        } else {
+            // Configuration has not been setup
+            $('#window_setupConnection_1').show();
+
+            // Find local bridge(s)
+            discoverBridges(function(e) {
+                discoveredBridges = JSON.parse(e);
+            });
+        }
+
+
+        $('#button_setupConnection_1_next').click(function() {
+            // show the next setup screen
+            $('#window_setupConnection_1').hide();
+            $('#window_setupConnection_2').show();
+        });
+
+        $('#button_register_hub').click(function() {
+            // Hide the register hub button so users dont spam, show waiting for hub label
+            $('#button_register_hub').hide();
+            $('#window_waitingforhub').show();
+
+            // Start polling the hue(s), try to register
+            for (i = 0; i < discoveredBridges.length; i++) {
+                hubPoll(i);
+            }
+        });
+
+        $('#menuItem_connection').click(function() {
+            $('#window_mainMenu').hide();
+            $('#window_connection').show();
+            $('#backArrow').show();
+        });
+
+        $('#menuItem_groups').click(function() {
+            $('#window_mainMenu').hide();
+            $('#window_groups').show();
+            $('#backArrow').show();
+
+            rebindGroups();
+        });
+
+        function rebindGroups() {
+            // Load groups from the config (if there are any)
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+            if (config.groups && config.groups.length > 0) {
+                var groupsHtml = "";
+                for (i = 0; i < config.groups.length; i++) {
+                    groupsHtml += "<li groupId='" + i + "'><div class='editlights'>L</div><div class='delete'>X</div>" + config.groups[i].name + "</li>";
+                }
+                $('#groupList').html(groupsHtml);
+
+                $('#clearGroups').show();
+            } else {
+                $('#groupList').html("<li>Group list empty</li>");
+
+                $('#clearGroups').hide();
+            }
+
+            $('.groups .delete').click(function() {
+                var parent = $(this).closest('li');
+                var groupId = parent.attr('groupId');
+
+                var config = JSON.parse(window.localStorage.lampConfiguration);
+                config.groups.splice(groupId, 1);
+                window.localStorage.lampConfiguration = JSON.stringify(config);
+
+                rebindGroups();
+            });
+
+            $('.groups .editlights').click(function() {
+                $('#window_editGroupLights').show();
+                $('#window_groups').hide();
+
+                var parent = $(this).closest('li');
+
+                getLights(function(e) {
+                    var allLights = JSON.parse(e);
+
+                    var groupId = parent.attr('groupId');
+
+                    rebindGroupLights(allLights, groupId);
+                });
+            });
+        }
+
+        function rebindGroupLights(allLights, groupId) {
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            var lightIdsInGroup = new Array();
+
+            if(config.groups[groupId].lights && config.groups[groupId].lights.length > 0) {
+                var groupLightsIncludedHtml = "";
+
+                for (i = 0; i < config.groups[groupId].lights.length; i++) {
+                    groupLightsIncludedHtml += "<li lightIndex='" + i + "' lightId='" + config.groups[groupId].lights[i].id + "'>" + config.groups[groupId].lights[i].name + "</li>";
+
+                    lightIdsInGroup[lightIdsInGroup.length] = config.groups[groupId].lights[i].id;
+                }
+
+                $('#groupLightsIncludedList').html(groupLightsIncludedHtml);
+            } else {
+                $('#groupLightsIncludedList').html("<li>No lights in this group</li>");
+            }
+
+            var groupLightsExcludedHtml = "";
+
+            for (i = 0; i < 50; i++) {
+                if (allLights[i] != null && $.inArray(i.toString(), lightIdsInGroup) == -1) {
+                    groupLightsExcludedHtml += "<li lightId='" + i + "'>" + allLights[i].name + "</li>"
+                }
+            }
+
+            $('#groupLightsExcludedList').html(groupLightsExcludedHtml);
+
+            $('#groupLightsIncludedList li').click(function() {
+                var lightIndex = $(this).attr('lightIndex');
+
+                var config = JSON.parse(window.localStorage.lampConfiguration);
+
+                config.groups[groupId].lights.splice(lightIndex, 1);
+
+                window.localStorage.lampConfiguration = JSON.stringify(config);
+
+                rebindGroupLights(allLights, groupId);
+            });
+
+            $('#groupLightsExcludedList li').click(function() {
+                var lightId = $(this).attr('lightId');
+
+                getLights(function(e) {
+                    var config = JSON.parse(window.localStorage.lampConfiguration);
+
+                    if(!config.groups[groupId].lights) {
+                        config.groups[groupId].lights = new Array();
+                    }
+
+                    config.groups[groupId].lights[config.groups[groupId].lights.length] = {
+                        id: lightId,
+                        name: allLights[lightId].name
+                    }
+
+                    window.localStorage.lampConfiguration = JSON.stringify(config);
+
+                    rebindGroupLights(allLights, groupId);
+
+                    blinkLightSingle(lightId, function(e) {
+
+                    });
+                });
+            });
+        }
+
+        $('#addNewGroup').click(function() {
+            $(this).hide();
+            $('#addNewGroupPanel').show();
+            $('#addNewGroupPanel input').focus();
+        });
+
+        $('#saveNewGroup').click(function() {
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            if(!config.groups) {
+                config.groups = new Array();
+            }
+
+            config.groups[config.groups.length] = {
+                name: $('#tbAddNewGroup').val()
+            }
+
+            window.localStorage.lampConfiguration = JSON.stringify(config);
+
+            rebindGroups();
+
+            $('#addNewGroupPanel').hide();
+            $('#addNewGroup').show();
+        });
+
+        $('#clearGroups').click(function() {
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+            config.groups = null;
+            window.localStorage.lampConfiguration = JSON.stringify(config);
+
+            rebindGroups();
+        });
+
+        $('#menuItem_ResetConnection').click(function() {
+            // Reset the brigdge connection
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+            config.bridgeIp = null;
+            config.bridgeId = null;
+            config.bridgeUsername = null;
+            window.localStorage.lampConfiguration = JSON.stringify(config);
+
+            // Redirect the user to the bridge setup screen
+            $('#window_setupConnection_2').show();
+            $('#window_connection').hide();
+        });
+
+        $('#menuItem_lights').click(function() {
+            getLights(function(e) {
+                locatedLights = JSON.parse(e);
+
+                var lightListHtml = "";
+
+                for (i = 1; i < 50; i++) {
+                    if (locatedLights[i] == null) {
+                        break;
+                    }
+                    lightListHtml += "<li lightid='" + i + "'><div class='rename'>rename</div><div class='save startHidden'>save</div><span class='label'>" + locatedLights[i].name + "</span><div class='fieldContainer'><input type='text' class='field startHidden' /></div></li>";
+                }
+
+                $('#lightsList').html(lightListHtml);
+
+                $('.rename').click(function() {
+                    var parent = $(this).closest('li');
+                    $('.rename').hide();
+                    $('.save', parent).show();
+
+                    var label = $('.label', parent);
+                    var field = $('.field', parent);
+                    label.hide();
+                    field.show();
+                    field.val(label.text());
+                    field.focus();
+
+                    // start blinking the light
+                    var lightid = parent.attr('lightid');
+                    blinkLight(lightid, function(e) {
+
+                    });
+                });
+
+                $('.save').click(function() {
+                    var parent = $(this).closest('li');
+                    $('.rename').show();
+                    $('.save', parent).hide();
+
+                    var label = $('.label', parent);
+                    var field = $('.field', parent);
+                    label.show();
+                    field.hide();
+                    label.text(field.val());
+
+
+                    var lightid = parent.attr('lightid');
+                    renameLight(lightid, field.val(), function(e) {
+
+                    });
+
+
+                    // stop blinking the light
+                    stopBlinkLight(lightid, function(e) {
+
+                    });
+                });
+            });
+
+            $('#window_mainMenu').hide();
+//            $('#window_mainMenu').animate({left:"-=300"},0);
+//            $('#window_mainMenu').animate({left:"-=100"},400);
+            $('#window_lights').show();
+            $('#backArrow').show();
+        });
+
+        $('#backArrow').click(function() {
+//            $('#window_mainMenu').animate({left:"+=300"},0);
+//            $('#window_mainMenu').animate({left:"+=100"},400, function() {
+//                $('#window_lights').hide();
+//            });
+
+            if ($('#window_editGroupLights').is(':visible')) {
+                $('#window_editGroupLights').hide();
+                $('#window_groups').show();
+            } else {
+                $('#window_connection').hide();
+                $('#window_lights').hide();
+                $('#window_groups').hide();
+
+                $('#window_mainMenu').show();
+                $('#backArrow').hide();
+            }
+        });
+
+        var connectedToHub = false;
+
+        function hubPoll(i) {
+            var xmlhttp;
+
+            if (window.XMLHttpRequest)
+            {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            }
+            else
+            {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function()
+            {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                    var response = JSON.parse(xmlhttp.responseText);
+
+                    // TODO: Possibility for more than one error...
+                    if (response[0].error != null) {
+                        //document.getElementById("registerResponse").innerHTML = response[0].error.description;
+                        //alert(xmlhttp.responseText);
+                        if(!connectedToHub) {
+                            setTimeout(function() {hubPoll(i);}, 1000);
+                        }
+                    } else {
+                        // Successfully connected to the hub
+                        connectedToHub = true;
+
+                        // This is the username the hub gave us
+                        var userName = response[0].success.username;
+
+                        // Setup the configuration
+                        if (window.localStorage.lampConfiguration) {
+                            // Configuration is available
+                            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+                            config.bridgeIp = discoveredBridges[i].internalipaddress;
+                            config.bridgeId = discoveredBridges[i].id;
+                            config.bridgeUsername = userName;
+
+                            window.localStorage.lampConfiguration = JSON.stringify(config);
+                        } else {
+                            // No configuration, create a new one
+                            window.localStorage.lampConfiguration = JSON.stringify({
+                                "bridgeIp": discoveredBridges[i].internalipaddress,
+                                "bridgeId": discoveredBridges[i].id,
+                                "bridgeUsername": userName
+                            });
+                        }
+
+                        // Show the next page
+                        $('#window_setupConnection_2').hide();
+                        $('#window_setupConnection_3').show();
+                    }
+                }
+            }
+
+            var message = JSON.stringify({"devicetype":"LAMP for Pebble"})
+            xmlhttp.open("POST", "http://" + discoveredBridges[i].internalipaddress + "/api",true);
+
+            xmlhttp.send(message);
+        }
+
+        //window.localStorage.lampConfiguration = {"bridgeid": "test"};
+        //document.getElementById("textLabel").innerText = window.localStorage.lampConfiguration;
+
+    </script>
+</body>
+
+
+</html>
