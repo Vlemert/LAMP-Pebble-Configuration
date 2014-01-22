@@ -583,66 +583,47 @@
         var connectedToHub = false;
 
         function hubPoll(i) {
-            var xmlhttp;
+            tryRegister(discoveredBridges[i].internalipaddress, "LAMP for Pebble", function(e) {
+                var response = JSON.parse(e);
 
-            if (window.XMLHttpRequest)
-            {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp=new XMLHttpRequest();
-            }
-            else
-            {// code for IE6, IE5
-                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.onreadystatechange=function()
-            {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-                    var response = JSON.parse(xmlhttp.responseText);
-
-                    // TODO: Possibility for more than one error...
-                    if (response[0].error != null) {
-                        //document.getElementById("registerResponse").innerHTML = response[0].error.description;
-                        //alert(xmlhttp.responseText);
-                        if(!connectedToHub) {
-                            setTimeout(function() {hubPoll(i);}, 1000);
-                        }
-                    } else {
-                        // Successfully connected to the hub
-                        connectedToHub = true;
-
-                        // This is the username the hub gave us
-                        var userName = response[0].success.username;
-
-                        // Setup the configuration
-                        if (window.localStorage.lampConfiguration) {
-                            // Configuration is available
-                            var config = JSON.parse(window.localStorage.lampConfiguration);
-
-                            config.bridgeIp = discoveredBridges[i].internalipaddress;
-                            config.bridgeId = discoveredBridges[i].id;
-                            config.bridgeUsername = userName;
-
-                            window.localStorage.lampConfiguration = JSON.stringify(config);
-                        } else {
-                            // No configuration, create a new one
-                            window.localStorage.lampConfiguration = JSON.stringify({
-                                "bridgeIp": discoveredBridges[i].internalipaddress,
-                                "bridgeId": discoveredBridges[i].id,
-                                "bridgeUsername": userName
-                            });
-                        }
-
-                        // Show the next page
-                        $('#window_setupConnection_2').hide();
-                        $('#window_setupConnection_3').show();
+                // TODO: Possibility for more than one error...
+                if (response[0].error != null) {
+                    //document.getElementById("registerResponse").innerHTML = response[0].error.description;
+                    //alert(xmlhttp.responseText);
+                    if(!connectedToHub) {
+                        setTimeout(function() {hubPoll(i);}, 1000);
                     }
+                } else {
+                    // Successfully connected to the hub
+                    connectedToHub = true;
+
+                    // This is the username the hub gave us
+                    var userName = response[0].success.username;
+
+                    // Setup the configuration
+                    if (window.localStorage.lampConfiguration) {
+                        // Configuration is available
+                        var config = JSON.parse(window.localStorage.lampConfiguration);
+
+                        config.bridgeIp = discoveredBridges[i].internalipaddress;
+                        config.bridgeId = discoveredBridges[i].id;
+                        config.bridgeUsername = userName;
+
+                        window.localStorage.lampConfiguration = JSON.stringify(config);
+                    } else {
+                        // No configuration, create a new one
+                        window.localStorage.lampConfiguration = JSON.stringify({
+                            "bridgeIp": discoveredBridges[i].internalipaddress,
+                            "bridgeId": discoveredBridges[i].id,
+                            "bridgeUsername": userName
+                        });
+                    }
+
+                    // Show the next page
+                    $('#window_setupConnection_2').hide();
+                    $('#window_setupConnection_3').show();
                 }
-            }
-
-            var message = JSON.stringify({"devicetype":"LAMP for Pebble"})
-            xmlhttp.open("POST", "http://" + discoveredBridges[i].internalipaddress + "/api",true);
-
-            xmlhttp.send(message);
+            });
         }
 
         //window.localStorage.lampConfiguration = {"bridgeid": "test"};
