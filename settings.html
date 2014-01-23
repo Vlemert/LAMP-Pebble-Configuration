@@ -3,7 +3,7 @@
 <head>
     <title></title>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="/js/hue.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/style.css" media="all" />
@@ -138,7 +138,7 @@
 
     <script>
         // vars
-        var discoveredBridges = new Array();
+        var discoveredBridges = [];
 
         // TODO:
         // At launch check app version (in call url), if version mismatch then redirect users to the store
@@ -246,7 +246,9 @@
         function rebindGroupLights(allLights, groupId) {
             var config = JSON.parse(window.localStorage.lampConfiguration);
 
-            var lightIdsInGroup = new Array();
+            var lightIdsInGroup = [];
+
+            var groupLightsIncludedList = $('#groupLightsIncludedList');
 
             if(config.groups[groupId].lights && config.groups[groupId].lights.length > 0) {
                 var groupLightsIncludedHtml = "";
@@ -257,9 +259,9 @@
                     lightIdsInGroup[lightIdsInGroup.length] = config.groups[groupId].lights[i].id;
                 }
 
-                $('#groupLightsIncludedList').html(groupLightsIncludedHtml);
+                groupLightsIncludedList.html(groupLightsIncludedHtml);
             } else {
-                $('#groupLightsIncludedList').html("<li>No lights in this group</li>");
+                groupLightsIncludedList.html("<li>No lights in this group</li>");
             }
 
             var groupLightsExcludedHtml = "";
@@ -270,9 +272,11 @@
                 }
             }
 
-            $('#groupLightsExcludedList').html(groupLightsExcludedHtml);
+            var groupLightsExcludedList = $('#groupLightsExcludedList');
 
-            $('#groupLightsIncludedList li').click(function() {
+            groupLightsExcludedList.html(groupLightsExcludedHtml);
+
+            groupLightsIncludedList.find('li').click(function() {
                 var lightIndex = $(this).attr('lightIndex');
 
                 var config = JSON.parse(window.localStorage.lampConfiguration);
@@ -284,20 +288,20 @@
                 rebindGroupLights(allLights, groupId);
             });
 
-            $('#groupLightsExcludedList li').click(function() {
+            groupLightsExcludedList.find('li').click(function() {
                 var lightId = $(this).attr('lightId');
 
                 getLights(function(e) {
                     var config = JSON.parse(window.localStorage.lampConfiguration);
 
                     if(!config.groups[groupId].lights) {
-                        config.groups[groupId].lights = new Array();
+                        config.groups[groupId].lights = [];
                     }
 
                     config.groups[groupId].lights[config.groups[groupId].lights.length] = {
                         id: lightId,
                         name: allLights[lightId].name
-                    }
+                    };
 
                     window.localStorage.lampConfiguration = JSON.stringify(config);
 
@@ -312,20 +316,21 @@
 
         $('#addNewGroup').click(function() {
             $(this).hide();
-            $('#addNewGroupPanel').show();
-            $('#addNewGroupPanel input').focus();
+            var addNewGroupPanel = $('#addNewGroupPanel');
+            addNewGroupPanel.show();
+            addNewGroupPanel.find('input').focus();
         });
 
         $('#saveNewGroup').click(function() {
             var config = JSON.parse(window.localStorage.lampConfiguration);
 
             if(!config.groups) {
-                config.groups = new Array();
+                config.groups = [];
             }
 
             config.groups[config.groups.length] = {
                 name: $('#tbAddNewGroup').val()
-            }
+            };
 
             window.localStorage.lampConfiguration = JSON.stringify(config);
 
@@ -428,8 +433,10 @@
 //                $('#window_lights').hide();
 //            });
 
-            if ($('#window_editGroupLights').is(':visible')) {
-                $('#window_editGroupLights').hide();
+            var window_editGroupLights = $('#window_editGroupLights');
+
+            if (window_editGroupLights.is(':visible')) {
+                window_editGroupLights.hide();
                 $('#window_groups').show();
             } else {
                 $('#window_connection').hide();
