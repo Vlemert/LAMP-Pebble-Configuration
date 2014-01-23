@@ -3,162 +3,12 @@
 <head>
     <title></title>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="/js/hue.js"></script>
-
-    <script>
-        /*var locatedHubs;
-        var locatedLights;
-
-
-        function locateHubs() {
-            var xmlhttp;
-
-            if (window.XMLHttpRequest)
-            {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp=new XMLHttpRequest();
-            }
-            else
-            {// code for IE6, IE5
-                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.onreadystatechange=function()
-            {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-                    locatedHubs = JSON.parse(xmlhttp.responseText);
-
-                    var hubListHtml = "";
-
-                    for (i = 0; i < locatedHubs.length; i++) {
-                        hubListHtml += "<li>" + locatedHubs[i].internalipaddress + "</li>";
-                    }
-
-                    document.getElementById("hubList").innerHTML = hubListHtml;
-                }
-            }
-            xmlhttp.open("GET","http://www.meethue.com/api/nupnp",true);
-            xmlhttp.send();
-        }
-
-        function connectToFirstHub() {
-            var xmlhttp;
-
-            if (window.XMLHttpRequest)
-            {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp=new XMLHttpRequest();
-            }
-            else
-            {// code for IE6, IE5
-                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.onreadystatechange=function()
-            {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-                    var response = JSON.parse(xmlhttp.responseText);
-
-                    alert(xmlhttp.responseText);
-
-                    // Possibility for more than one error...
-                    if (response[0].error != null) {
-                        document.getElementById("registerResponse").innerHTML = response[0].error.description;
-                    } else {
-                        document.getElementById("registerResponse").innerHTML = "Success!";
-                    }
-                }
-            }
-
-            var message = JSON.stringify({"devicetype":"LAMP for Pebble"})
-            xmlhttp.open("POST", "http://" + locatedHubs[0].internalipaddress + "/api",true);
-
-            xmlhttp.send(message);
-        }
-
-        function getLights() {
-            var xmlhttp;
-
-            if (window.XMLHttpRequest)
-            {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp=new XMLHttpRequest();
-            }
-            else
-            {// code for IE6, IE5
-                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.onreadystatechange=function()
-            {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-                    locatedLights = JSON.parse(xmlhttp.responseText);
-
-                    var lightListHtml = "";
-
-                    for (i = 1; i < 50; i++) {
-                        if (locatedLights[i] == null) {
-                            break;
-                        }
-                        lightListHtml += "<li>" + locatedLights[i].name + "</li>";
-                    }
-
-                    document.getElementById("lightList").innerHTML = lightListHtml;
-                }
-            }
-            xmlhttp.open("GET", "http://" + locatedHubs[0].internalipaddress + "/api/lamptestuser/lights",true);
-            xmlhttp.send();
-        }
-
-        function turnFirstOff() {
-            var xmlhttp;
-
-            if (window.XMLHttpRequest)
-            {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp=new XMLHttpRequest();
-            }
-            else
-            {// code for IE6, IE5
-                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.onreadystatechange=function()
-            {
-                if (xmlhttp.readyState==4 && xmlhttp.status==200)
-                {
-                    var response = JSON.parse(xmlhttp.responseText);
-
-                    alert(xmlhttp.responseText);
-                    // Possibility for more than one error...
-                    //if (response[0].error != null) {
-                    //    document.getElementById("registerResponse").innerHTML = response[0].error.description;
-                    //} else {
-                    //    document.getElementById("registerResponse").innerHTML = "Success!";
-                    //}
-                }
-            }
-
-            var message = JSON.stringify({"on":true})
-            xmlhttp.open("PUT", "http://" + locatedHubs[0].internalipaddress + "/api/lamptestuser/lights/1/state",true);
-
-            xmlhttp.send(message);
-        }*/
-    </script>
 
     <link rel="stylesheet" type="text/css" href="css/style.css" media="all" />
 </head>
 <body>
-    <!--<button type="button" onclick="locateHubs()">Locate hubs</button>
-    <ul id="hubList">
-    </ul>
-    <hr />
-    <button type="button" onclick="connectToFirstHub()">Register with first hub</button>
-    <div id="registerResponse">
-    </div>
-    <hr />
-    <button type="button" onclick="getLights()">Get lights</button>
-    <ul id="lightList">
-    </ul>
-    <hr />
-    <button type="button" onclick="turnFirstOff()">Turn light 1 off</button>-->
-
     <div class="appHeader">
         <div class="backArrow startHidden" id="backArrow">
             <
@@ -175,22 +25,22 @@
         </div>
     </div>
     <div id="window_setupConnection_2" class="startHidden">
-        <h1>Connecting with your Hue hub</h1>
+        <h1>Connecting with your Hue bridge</h1>
         <p>
-            First we need to connect with your hub. You do this by pressing the connect button below and the center button on your hub.
+            First we need to connect with your bridge. You do this by pressing the connect button below and the center button on your bridge.
         </p>
         <p>
             The order doesn't matter, just make sure you press both buttons within 30 seconds.
         </p>
-        <div id="button_register_hub">
+        <div id="button_register_bridge">
             Connect
         </div>
-        <div id="window_waitingforhub" class="startHidden">
-            Waiting for the hub button to be pressed...
+        <div id="window_waitingforbridge" class="startHidden">
+            Waiting for the bridge button to be pressed...
         </div>
     </div>
     <div id="window_setupConnection_3" class="startHidden">
-        <h1>Succesfully connected to the hub!</h1>
+        <h1>Succesfully connected to the bridge!</h1>
         <p>
             We have successfully set up a connection! Press the next button to configure your lights, groups and blueprints. Have fun!
         </p>
@@ -288,7 +138,7 @@
 
     <script>
         // vars
-        var discoveredBridges = new Array();
+        var discoveredBridges = [];
 
         // TODO:
         // At launch check app version (in call url), if version mismatch then redirect users to the store
@@ -319,14 +169,14 @@
             $('#window_setupConnection_2').show();
         });
 
-        $('#button_register_hub').click(function() {
-            // Hide the register hub button so users dont spam, show waiting for hub label
-            $('#button_register_hub').hide();
-            $('#window_waitingforhub').show();
+        $('#button_register_bridge').click(function() {
+            // Hide the register bridge button so users dont spam, show waiting for bridge label
+            $('#button_register_bridge').hide();
+            $('#window_waitingforbridge').show();
 
             // Start polling the hue(s), try to register
             for (i = 0; i < discoveredBridges.length; i++) {
-                hubPoll(i);
+                bridgePoll(i);
             }
         });
 
@@ -396,7 +246,9 @@
         function rebindGroupLights(allLights, groupId) {
             var config = JSON.parse(window.localStorage.lampConfiguration);
 
-            var lightIdsInGroup = new Array();
+            var lightIdsInGroup = [];
+
+            var groupLightsIncludedList = $('#groupLightsIncludedList');
 
             if(config.groups[groupId].lights && config.groups[groupId].lights.length > 0) {
                 var groupLightsIncludedHtml = "";
@@ -407,9 +259,9 @@
                     lightIdsInGroup[lightIdsInGroup.length] = config.groups[groupId].lights[i].id;
                 }
 
-                $('#groupLightsIncludedList').html(groupLightsIncludedHtml);
+                groupLightsIncludedList.html(groupLightsIncludedHtml);
             } else {
-                $('#groupLightsIncludedList').html("<li>No lights in this group</li>");
+                groupLightsIncludedList.html("<li>No lights in this group</li>");
             }
 
             var groupLightsExcludedHtml = "";
@@ -420,9 +272,11 @@
                 }
             }
 
-            $('#groupLightsExcludedList').html(groupLightsExcludedHtml);
+            var groupLightsExcludedList = $('#groupLightsExcludedList');
 
-            $('#groupLightsIncludedList li').click(function() {
+            groupLightsExcludedList.html(groupLightsExcludedHtml);
+
+            groupLightsIncludedList.find('li').click(function() {
                 var lightIndex = $(this).attr('lightIndex');
 
                 var config = JSON.parse(window.localStorage.lampConfiguration);
@@ -434,20 +288,20 @@
                 rebindGroupLights(allLights, groupId);
             });
 
-            $('#groupLightsExcludedList li').click(function() {
+            groupLightsExcludedList.find('li').click(function() {
                 var lightId = $(this).attr('lightId');
 
                 getLights(function(e) {
                     var config = JSON.parse(window.localStorage.lampConfiguration);
 
                     if(!config.groups[groupId].lights) {
-                        config.groups[groupId].lights = new Array();
+                        config.groups[groupId].lights = [];
                     }
 
                     config.groups[groupId].lights[config.groups[groupId].lights.length] = {
                         id: lightId,
                         name: allLights[lightId].name
-                    }
+                    };
 
                     window.localStorage.lampConfiguration = JSON.stringify(config);
 
@@ -462,20 +316,21 @@
 
         $('#addNewGroup').click(function() {
             $(this).hide();
-            $('#addNewGroupPanel').show();
-            $('#addNewGroupPanel input').focus();
+            var addNewGroupPanel = $('#addNewGroupPanel');
+            addNewGroupPanel.show();
+            addNewGroupPanel.find('input').focus();
         });
 
         $('#saveNewGroup').click(function() {
             var config = JSON.parse(window.localStorage.lampConfiguration);
 
             if(!config.groups) {
-                config.groups = new Array();
+                config.groups = [];
             }
 
             config.groups[config.groups.length] = {
                 name: $('#tbAddNewGroup').val()
-            }
+            };
 
             window.localStorage.lampConfiguration = JSON.stringify(config);
 
@@ -578,8 +433,10 @@
 //                $('#window_lights').hide();
 //            });
 
-            if ($('#window_editGroupLights').is(':visible')) {
-                $('#window_editGroupLights').hide();
+            var window_editGroupLights = $('#window_editGroupLights');
+
+            if (window_editGroupLights.is(':visible')) {
+                window_editGroupLights.hide();
                 $('#window_groups').show();
             } else {
                 $('#window_connection').hide();
@@ -591,9 +448,9 @@
             }
         });
 
-        var connectedToHub = false;
+        var connectedToBridge = false;
 
-        function hubPoll(i) {
+        function bridgePoll(i) {
             tryRegister(discoveredBridges[i].internalipaddress, "LAMP for Pebble", function(e) {
                 var response = JSON.parse(e);
 
@@ -601,14 +458,14 @@
                 if (response[0].error != null) {
                     //document.getElementById("registerResponse").innerHTML = response[0].error.description;
                     //alert(xmlhttp.responseText);
-                    if(!connectedToHub) {
-                        setTimeout(function() {hubPoll(i);}, 1000);
+                    if(!connectedToBridge) {
+                        setTimeout(function() {bridgePoll(i);}, 1000);
                     }
                 } else {
-                    // Successfully connected to the hub
-                    connectedToHub = true;
+                    // Successfully connected to the bridge
+                    connectedToBridge = true;
 
-                    // This is the username the hub gave us
+                    // This is the username the bridge gave us
                     var userName = response[0].success.username;
 
                     // Setup the configuration

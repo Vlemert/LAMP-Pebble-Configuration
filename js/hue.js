@@ -19,7 +19,7 @@ function discoverBridges(success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
     xmlhttp.open("GET","http://www.meethue.com/api/nupnp",true);
     xmlhttp.send();
 }
@@ -41,7 +41,7 @@ function tryRegister(bridgeIp, deviceType, success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
 
     var message = JSON.stringify({"devicetype": deviceType});
     xmlhttp.open("POST", "http://" + bridgeIp + "/api",true);
@@ -66,7 +66,7 @@ function getLights(success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
 
     var config = JSON.parse(window.localStorage.lampConfiguration);
     xmlhttp.open("GET", "http://" + config.bridgeIp + "/api/" + config.bridgeUsername + "/lights",true);
@@ -90,7 +90,7 @@ function blinkLightSingle(lightId, success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
 
     var config = JSON.parse(window.localStorage.lampConfiguration);
     xmlhttp.open("PUT", "http://" + config.bridgeIp + "/api/" + config.bridgeUsername + "/lights/" + lightId + "/state",true);
@@ -117,7 +117,7 @@ function blinkLight(lightId, success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
 
     var config = JSON.parse(window.localStorage.lampConfiguration);
     xmlhttp.open("PUT", "http://" + config.bridgeIp + "/api/" + config.bridgeUsername + "/lights/" + lightId + "/state",true);
@@ -144,7 +144,7 @@ function stopBlinkLight(lightId, success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
 
     var config = JSON.parse(window.localStorage.lampConfiguration);
     xmlhttp.open("PUT", "http://" + config.bridgeIp + "/api/" + config.bridgeUsername + "/lights/" + lightId + "/state",true);
@@ -172,7 +172,7 @@ function renameLight(lightId, name, success) {
         {
             success(xmlhttp.responseText);
         }
-    }
+    };
 
     var config = JSON.parse(window.localStorage.lampConfiguration);
     xmlhttp.open("PUT", "http://" + config.bridgeIp + "/api/" + config.bridgeUsername + "/lights/" + lightId,true);
