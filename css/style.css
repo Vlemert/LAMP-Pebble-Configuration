@@ -133,3 +133,12 @@ body {
 input {
     height: 30px;
 }
+
+.inlineFieldContainer {
+    margin-top: -8px;
+}
+
+.inlineAbsoluteRight {
+    position: absolute;
+    right: 5px;
+}
