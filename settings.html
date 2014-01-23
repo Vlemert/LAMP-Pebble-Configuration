@@ -77,9 +77,6 @@
             <input type="text" class="field" id="tbAddNewGroup" />
             <div class='save' id="saveNewGroup">save</div>
         </div>
-        <div id="clearGroups">
-            Delete all groups
-        </div>
     </div>
 
     <div id="window_editGroupLights" class="window" parentWindow="window_groups">
@@ -241,12 +238,8 @@
                     groupsHtml += "<li groupId='" + i + "'><div class='windowAction editlights' targetWindow='window_editGroupLights'>L</div><div class='delete'>X</div>" + config.groups[i].name + "</li>";
                 }
                 $('#groupList').html(groupsHtml);
-
-                $('#clearGroups').show();
             } else {
                 $('#groupList').html("<li>Group list empty</li>");
-
-                $('#clearGroups').hide();
             }
 
             $('.groups .delete').click(function() {
@@ -358,14 +351,6 @@
 
             $('#addNewGroupPanel').hide();
             $('#addNewGroup').show();
-        });
-
-        $('#clearGroups').click(function() {
-            var config = JSON.parse(window.localStorage.lampConfiguration);
-            config.groups = null;
-            window.localStorage.lampConfiguration = JSON.stringify(config);
-
-            rebindGroups();
         });
 
         $('#menuItem_ResetConnection').click(function() {
