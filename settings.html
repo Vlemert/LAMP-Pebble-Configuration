@@ -25,22 +25,22 @@
         </div>
     </div>
     <div id="window_setupConnection_2" class="startHidden">
-        <h1>Connecting with your Hue hub</h1>
+        <h1>Connecting with your Hue bridge</h1>
         <p>
-            First we need to connect with your hub. You do this by pressing the connect button below and the center button on your hub.
+            First we need to connect with your bridge. You do this by pressing the connect button below and the center button on your bridge.
         </p>
         <p>
             The order doesn't matter, just make sure you press both buttons within 30 seconds.
         </p>
-        <div id="button_register_hub">
+        <div id="button_register_bridge">
             Connect
         </div>
-        <div id="window_waitingforhub" class="startHidden">
-            Waiting for the hub button to be pressed...
+        <div id="window_waitingforbridge" class="startHidden">
+            Waiting for the bridge button to be pressed...
         </div>
     </div>
     <div id="window_setupConnection_3" class="startHidden">
-        <h1>Succesfully connected to the hub!</h1>
+        <h1>Succesfully connected to the bridge!</h1>
         <p>
             We have successfully set up a connection! Press the next button to configure your lights, groups and blueprints. Have fun!
         </p>
@@ -169,14 +169,14 @@
             $('#window_setupConnection_2').show();
         });
 
-        $('#button_register_hub').click(function() {
-            // Hide the register hub button so users dont spam, show waiting for hub label
-            $('#button_register_hub').hide();
-            $('#window_waitingforhub').show();
+        $('#button_register_bridge').click(function() {
+            // Hide the register bridge button so users dont spam, show waiting for bridge label
+            $('#button_register_bridge').hide();
+            $('#window_waitingforbridge').show();
 
             // Start polling the hue(s), try to register
             for (i = 0; i < discoveredBridges.length; i++) {
-                hubPoll(i);
+                bridgePoll(i);
             }
         });
 
@@ -448,9 +448,9 @@
             }
         });
 
-        var connectedToHub = false;
+        var connectedToBridge = false;
 
-        function hubPoll(i) {
+        function bridgePoll(i) {
             tryRegister(discoveredBridges[i].internalipaddress, "LAMP for Pebble", function(e) {
                 var response = JSON.parse(e);
 
@@ -458,14 +458,14 @@
                 if (response[0].error != null) {
                     //document.getElementById("registerResponse").innerHTML = response[0].error.description;
                     //alert(xmlhttp.responseText);
-                    if(!connectedToHub) {
-                        setTimeout(function() {hubPoll(i);}, 1000);
+                    if(!connectedToBridge) {
+                        setTimeout(function() {bridgePoll(i);}, 1000);
                     }
                 } else {
-                    // Successfully connected to the hub
-                    connectedToHub = true;
+                    // Successfully connected to the bridge
+                    connectedToBridge = true;
 
-                    // This is the username the hub gave us
+                    // This is the username the bridge gave us
                     var userName = response[0].success.username;
 
                     // Setup the configuration
