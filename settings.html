@@ -276,6 +276,12 @@
             </div>
             Connection
         </div>
+        <div class="menuItem" id="menuItem_save">
+            <div class="menuArrow">
+                >
+            </div>
+            Save settings
+        </div>
     </div>
 
     <span id="textLabel"></span>
@@ -328,6 +334,11 @@
             $('#window_mainMenu').hide();
             $('#window_connection').show();
             $('#backArrow').show();
+        });
+
+        $('#menuItem_save').click(function() {
+            // Return config to pebble js
+            window.location.href = "pebblejs://close#" + encodeURIComponent(JSON.stringify(window.localStorage.lampConfiguration));
         });
 
         $('#menuItem_groups').click(function() {
