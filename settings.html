@@ -15,7 +15,7 @@
         </div>
         L.A.M.P.
     </div>
-    <div id="window_setupConnection_1" class="startHidden">
+    <div id="window_setupConnection_1" class="window">
         <h1>Welcome to the L.A.M.P. configuration</h1>
         <p>
             It appears that this is the first time you launch L.A.M.P. Follow the steps and I will guide you through the process.
@@ -24,7 +24,8 @@
             <div id="button_setupConnection_1_next">Next</div>
         </div>
     </div>
-    <div id="window_setupConnection_2" class="startHidden">
+
+    <div id="window_setupConnection_2" class="window">
         <h1>Connecting with your Hue bridge</h1>
         <p>
             First we need to connect with your bridge. You do this by pressing the connect button below and the center button on your bridge.
@@ -39,7 +40,8 @@
             Waiting for the bridge button to be pressed...
         </div>
     </div>
-    <div id="window_setupConnection_3" class="startHidden">
+
+    <div id="window_setupConnection_3" class="window">
         <h1>Succesfully connected to the bridge!</h1>
         <p>
             We have successfully set up a connection! Press the next button to configure your lights, groups and blueprints. Have fun!
@@ -49,13 +51,13 @@
         </div>
     </div>
 
-    <div id="window_lights" class="startHidden">
+    <div id="window_lights" class="window" parentWindow="window_mainMenu">
         <ul id="lightsList" class="lamps">
             <li>Loading...</li>
         </ul>
     </div>
 
-    <div id="window_connection" class="startHidden">
+    <div id="window_connection" class="window" parentWindow="window_mainMenu">
         <div class="menuItem" id="menuItem_ResetConnection">
             <div class="menuArrow">
                 >
@@ -64,14 +66,14 @@
         </div>
     </div>
 
-    <div id="window_groups" class="startHidden">
+    <div id="window_groups" class="window" parentWindow="window_mainMenu">
         <ul id="groupList" class="groups">
             <li>Loading...</li>
         </ul>
         <div id="addNewGroup">
             Add new group
         </div>
-        <div id="addNewGroupPanel" class="startHidden">
+        <div id="addNewGroupPanel" class="window">
             <input type="text" class="field" id="tbAddNewGroup" />
             <div class='save' id="saveNewGroup">save</div>
         </div>
@@ -80,7 +82,7 @@
         </div>
     </div>
 
-    <div id="window_editGroupLights" class="startHidden">
+    <div id="window_editGroupLights" class="window" parentWindow="window_groups">
         <div class="separator">
             In this group (click to remove)
         </div>
@@ -95,38 +97,38 @@
         </ul>
     </div>
 
-    <div id="window_mainMenu" class="startHidden">
-        <div class="menuItem" id="menuItem_lights">
+    <div id="window_mainMenu" class="window">
+        <div class="menuItem windowAction" id="menuItem_lights" targetWindow="window_lights">
             <div class="menuArrow">
                 >
             </div>
             Lights
         </div>
-        <div class="menuItem" id="menuItem_groups">
+        <div class="menuItem windowAction" id="menuItem_groups" targetWindow="window_groups">
             <div class="menuArrow">
                 >
             </div>
             Groups
         </div>
-        <div class="menuItem">
+        <div class="menuItem windowAction">
             <div class="menuArrow">
                 >
             </div>
             Blueprints
         </div>
-        <div class="menuItem">
+        <div class="menuItem windowAction">
             <div class="menuArrow">
                 >
             </div>
             Presets
         </div>
-        <div class="menuItem" id="menuItem_connection">
+        <div class="menuItem windowAction" id="menuItem_connection" targetWindow="window_connection">
             <div class="menuArrow">
                 >
             </div>
             Connection
         </div>
-        <div class="menuItem" id="menuItem_save">
+        <div class="menuItem windowAction" id="menuItem_save">
             <div class="menuArrow">
                 >
             </div>
@@ -151,10 +153,10 @@
         // At launch, we check if there is a lamp configuration set
         if (window.localStorage.lampConfiguration && JSON.parse(window.localStorage.lampConfiguration).bridgeIp && JSON.parse(window.localStorage.lampConfiguration).bridgeId && JSON.parse(window.localStorage.lampConfiguration).bridgeUsername) {
             // Configuration is available and complete (as far as the bridge connection concerns)
-            $('#window_mainMenu').show();
+            $('#window_mainMenu').addClass('current');
         } else {
             // Configuration has not been setup
-            $('#window_setupConnection_1').show();
+            $('#window_setupConnection_1').addClass('current');
 
             // Find local bridge(s)
             discoverBridges(function(e) {
@@ -165,8 +167,8 @@
 
         $('#button_setupConnection_1_next').click(function() {
             // show the next setup screen
-            $('#window_setupConnection_1').hide();
-            $('#window_setupConnection_2').show();
+            $('#window_setupConnection_1').removeClass('current');
+            $('#window_setupConnection_2').addClass('current');
         });
 
         $('#button_register_bridge').click(function() {
@@ -180,23 +182,54 @@
             }
         });
 
-        $('#menuItem_connection').click(function() {
-            $('#window_mainMenu').hide();
-            $('#window_connection').show();
-            $('#backArrow').show();
-        });
+        function rebindWindowActions() {
+            // Centralized windowAction button handler
+            $('.windowAction').click(function() {
+                // Hide all windows
+                $('.window').removeClass('current');
+
+                // Find and show the target
+                var targetName = $(this).attr('targetWindow');
+                var target = $('#' + targetName);
+                target.addClass('current');
+
+                switch(targetName)
+                {
+                    case "window_lights":
+                        loadLights();
+                        break;
+                    case "window_groups":
+                        rebindGroups();
+                        break;
+                    case "window_connection":
+                    // No extra code execution required
+                    case "window_editGroupLights":
+                        var parent = $(this).closest('li');
+
+                        getLights(function(e) {
+                            var allLights = JSON.parse(e);
+
+                            var groupId = parent.attr('groupId');
+
+                            rebindGroupLights(allLights, groupId);
+                        });
+                    default:
+                    // Do nothing..
+                }
+
+                // Get the target's parent, if there is one, show the back arrow
+                var parentWindow = target.attr('parentWindow');
+                if (parentWindow) {
+                    $('#backArrow').show();
+                } else {
+                    $('#backArrow').hide();
+                }
+            });
+        }
 
         $('#menuItem_save').click(function() {
             // Return config to pebble js
             window.location.href = "pebblejs://close#" + encodeURIComponent(JSON.stringify(window.localStorage.lampConfiguration));
-        });
-
-        $('#menuItem_groups').click(function() {
-            $('#window_mainMenu').hide();
-            $('#window_groups').show();
-            $('#backArrow').show();
-
-            rebindGroups();
         });
 
         function rebindGroups() {
@@ -205,7 +238,7 @@
             if (config.groups && config.groups.length > 0) {
                 var groupsHtml = "";
                 for (i = 0; i < config.groups.length; i++) {
-                    groupsHtml += "<li groupId='" + i + "'><div class='editlights'>L</div><div class='delete'>X</div>" + config.groups[i].name + "</li>";
+                    groupsHtml += "<li groupId='" + i + "'><div class='windowAction editlights' targetWindow='window_editGroupLights'>L</div><div class='delete'>X</div>" + config.groups[i].name + "</li>";
                 }
                 $('#groupList').html(groupsHtml);
 
@@ -227,20 +260,7 @@
                 rebindGroups();
             });
 
-            $('.groups .editlights').click(function() {
-                $('#window_editGroupLights').show();
-                $('#window_groups').hide();
-
-                var parent = $(this).closest('li');
-
-                getLights(function(e) {
-                    var allLights = JSON.parse(e);
-
-                    var groupId = parent.attr('groupId');
-
-                    rebindGroupLights(allLights, groupId);
-                });
-            });
+            rebindWindowActions();
         }
 
         function rebindGroupLights(allLights, groupId) {
@@ -361,7 +381,7 @@
             $('#window_connection').hide();
         });
 
-        $('#menuItem_lights').click(function() {
+        function loadLights() {
             getLights(function(e) {
                 locatedLights = JSON.parse(e);
 
@@ -419,32 +439,27 @@
                     });
                 });
             });
-
-            $('#window_mainMenu').hide();
-//            $('#window_mainMenu').animate({left:"-=300"},0);
-//            $('#window_mainMenu').animate({left:"-=100"},400);
-            $('#window_lights').show();
-            $('#backArrow').show();
-        });
+        }
 
         $('#backArrow').click(function() {
-//            $('#window_mainMenu').animate({left:"+=300"},0);
-//            $('#window_mainMenu').animate({left:"+=100"},400, function() {
-//                $('#window_lights').hide();
-//            });
+            // Get the current window
+            var currentWindow = $('.window.current');
 
-            var window_editGroupLights = $('#window_editGroupLights');
+            // Get it's parent window
+            var parentWindowId = currentWindow.attr('parentWindow');
+            var parentWindow = $('#' + parentWindowId);
 
-            if (window_editGroupLights.is(':visible')) {
-                window_editGroupLights.hide();
-                $('#window_groups').show();
+            // Hide all windows
+            $('.window').removeClass('current');
+
+            // Show parent window
+            parentWindow.addClass('current');
+
+            // Check if parent window has a parent, if so, show the back arrow, hide otherwise
+            if (parentWindow.attr('parentWindow')) {
+                $(this).show();
             } else {
-                $('#window_connection').hide();
-                $('#window_lights').hide();
-                $('#window_groups').hide();
-
-                $('#window_mainMenu').show();
-                $('#backArrow').hide();
+                $(this).hide();
             }
         });
 
@@ -497,6 +512,8 @@
         //window.localStorage.lampConfiguration = {"bridgeid": "test"};
         //document.getElementById("textLabel").innerText = window.localStorage.lampConfiguration;
 
+
+        rebindWindowActions();
     </script>
 </body>
 
