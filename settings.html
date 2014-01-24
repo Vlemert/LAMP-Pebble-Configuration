@@ -58,6 +58,18 @@
     </div>
 
     <div id="window_connection" class="window" parentWindow="window_mainMenu">
+        <div class="separator">
+            Connection info
+        </div>
+        <div class="menuItem">
+            Bridge IP: <span id="lblConnectionIP"></span>
+        </div>
+        <div class="menuItem">
+            Lights: <span id="lblConnectionLightCount"></span>
+        </div>
+        <div class="separator">
+            Actions
+        </div>
         <div class="menuItem" id="menuItem_ResetConnection">
             <div class="menuArrow">
                 >
@@ -209,7 +221,12 @@
                         rebindGroups();
                         break;
                     case "window_connection":
-                    // No extra code execution required
+                        $('#lblConnectionIP').html(JSON.parse(window.localStorage.lampConfiguration).bridgeIp);
+                        getLights(function(e) {
+                            locatedLights = JSON.parse(e);
+                            $('#lblConnectionLightCount').html(Object.keys(locatedLights).length);
+                        });
+                        break;
                     case "window_editGroupLights":
                         var parent = $(this).closest('li');
 
@@ -220,6 +237,7 @@
 
                             rebindGroupLights(allLights, groupId);
                         });
+                        break;
                     default:
                     // Do nothing..
                 }
