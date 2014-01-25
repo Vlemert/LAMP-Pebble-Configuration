@@ -109,7 +109,96 @@
     </div>
 
     <div id="window_presets" class="window" parentWindow="window_mainMenu">
-        Presets...
+        <div class="separator">
+            Generic presets
+        </div>
+        <ul id="genericPresetsList" class="list">
+            <li>Loading...</li>
+        </ul>
+        <div class="menuItem" id="addNewGenericPreset">
+            Add new
+        </div>
+        <div id="addNewGenericPresetPanel" class="menuItem startHidden">
+            <div class='inlineAbsoluteRight' id="saveNewGenericPreset">save</div>
+            <div class='inlineFieldContainer'>
+                <input type="text" class="field" id="tbAddNewGenericPreset" />
+            </div>
+        </div>
+        <div class="separator">
+            Fixed presets
+        </div>
+        <ul id="fixedPresetsList" class="list">
+            <li>Loading...</li>
+        </ul>
+        <div class="menuItem" id="addNewFixedPreset">
+            Add new
+        </div>
+    </div>
+
+    <div id="window_editGenericPreset" class="window" parentWindow="window_presets">
+        <div class="separator">
+            Edit generic preset
+        </div>
+        <div class="menuItem">
+            Name: <span id="lblGenericPresetName"></span>
+        </div>
+        <div class="separator">
+            Channels
+        </div>
+        <ul id="genericPresetChannelList" class="list">
+            <li>Loading...</li>
+        </ul>
+        <div class="menuItem" id="addNewGenericPresetChannel">
+            Add new
+        </div>
+        <div class="separator">
+            Actions
+        </div>
+        <div class="menuItem windowAction" id="btDeleteGenericPreset" targetWindow="window_presets">
+            Delete preset
+        </div>
+    </div>
+
+    <div id="window_editGenericPresetChannel" class="window">
+        <div class="separator">
+            Brightness
+        </div>
+        <div class="menuItem">
+            <input id="ipGenericPresetChannelBrightness" type="range" min="0" max="255" style="width: 90%;" />
+        </div>
+        <div class="separator">
+            Color temperature
+        </div>
+        <div class="menuItem">
+            Not supported yet...
+        </div>
+        <div class="separator">
+            Hue
+        </div>
+        <div class="menuItem">
+            <input id="ipGenericPresetChannelHue" type="range" min="0" max="65535" style="width: 90%;" />
+        </div>
+        <div class="separator">
+            Saturation
+        </div>
+        <div class="menuItem">
+            <input id="ipGenericPresetChannelSaturation" type="range" min="0" max="255" style="width: 90%;" />
+        </div>
+        <div class="separator">
+            Actions
+        </div>
+        <div class="menuItem windowAction" id="btSaveGenericPresetChannel" targetWindow="window_editGenericPreset">
+            Save changes
+        </div>
+        <div class="menuItem">
+            Copy a light's state
+        </div>
+        <div class="menuItem">
+            Copy a channel
+        </div>
+        <div class="menuItem windowAction" id="btDeleteGenericPresetChannel" targetWindow="window_editGenericPreset">
+            Delete channel
+        </div>
     </div>
 
     <div id="window_blueprints" class="window" parentWindow="window_mainMenu">
@@ -238,6 +327,22 @@
                             rebindGroupLights(allLights, groupId);
                         });
                         break;
+                    case "window_presets":
+                        rebindGenericPresets();
+                        break;
+                    case "window_editGenericPreset":
+                        var sender = $(this);
+                        var genericPresetId = sender.attr('genericPresetId');
+
+                        initializeEditGenericPreset(genericPresetId);
+                        break;
+                    case "window_editGenericPresetChannel":
+                        var sender = $(this);
+                        var genericPresetId = sender.attr('genericPresetId');
+                        var genericPresetChannelId = sender.attr('genericPresetChannelId');
+
+                        initializeEditGenericPresetChannel(genericPresetId, genericPresetChannelId);
+                        break;
                     default:
                     // Do nothing..
                 }
@@ -256,6 +361,143 @@
             // Return config to pebble js
             window.location.href = "pebblejs://close#" + encodeURIComponent(JSON.stringify(window.localStorage.lampConfiguration));
         });
+
+        function rebindGenericPresets() {
+            // Load generic presets from the config (if there are any)
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+            var genericPresetsList = $('#genericPresetsList');
+            if (config.presets && config.presets.generic && config.presets.generic.length > 0) {
+                var genericPresetsHtml = "";
+                for (i = 0; i < config.presets.generic.length; i++) {
+                    genericPresetsHtml += "<li genericPresetId='" + i + "' class='windowAction' targetWindow='window_editGenericPreset'>" + config.presets.generic[i].name + "</li>";
+                }
+                genericPresetsList.html(genericPresetsHtml);
+            } else {
+                genericPresetsList.html("<li>Preset list empty</li>");
+            }
+
+            // List contains windowActions, rebind those
+            rebindWindowActions();
+        }
+
+        $('#addNewGenericPreset').click(function() {
+            $(this).hide();
+            var addNewGenericPresetPanel = $('#addNewGenericPresetPanel');
+            addNewGenericPresetPanel.show();
+            addNewGenericPresetPanel.find('input').focus();
+        });
+
+        $('#saveNewGenericPreset').click(function() {
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            if(!config.presets) {
+                config.presets = {
+                    generic: [],
+                    fixed: []
+                }
+            }
+
+            config.presets.generic[config.presets.generic.length] = {
+                name: $('#tbAddNewGenericPreset').val(),
+                channels: []
+            };
+
+            window.localStorage.lampConfiguration = JSON.stringify(config);
+
+            rebindGenericPresets();
+
+            $('#addNewGenericPresetPanel').hide();
+            $('#addNewGenericPreset').show();
+        });
+
+        function initializeEditGenericPreset(genericPresetId) {
+            // Get generic preset
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            var genericPreset = config.presets.generic[genericPresetId];
+
+            $('#lblGenericPresetName').html(genericPreset.name);
+
+
+            rebindGenericPresetChannels(genericPresetId);
+
+            $('#addNewGenericPresetChannel').click(function() {
+                genericPreset.channels[genericPreset.channels.length] = {
+                    bri: 255,
+                    hue: 0,
+                    sat: 255,
+                    xy: null,
+                    ct: null,
+                    colormode: null // If colormode is null, the channel is considered unset
+                }
+
+                window.localStorage.lampConfiguration = JSON.stringify(config);
+
+                rebindGenericPresetChannels(genericPresetId);
+            });
+
+            // Bind this separate from windowActions, can't derive this from the targetWindow..
+            $('#btDeleteGenericPreset').click(function() {
+                config.presets.generic.splice(genericPresetId, 1);
+
+                window.localStorage.lampConfiguration = JSON.stringify(config);
+            })
+
+            rebindWindowActions();
+        }
+
+        function rebindGenericPresetChannels(genericPresetId) {
+            // Load channels from the config (if there are any)
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+            var genericPresetChannelList = $('#genericPresetChannelList');
+            if (config.presets.generic[genericPresetId].channels.length > 0) {
+                var genericPresetChannelHtml = "";
+                for (i = 0; i < config.presets.generic[genericPresetId].channels.length; i++) {
+                    genericPresetChannelHtml += "<li genericPresetId='" + genericPresetId + "' genericPresetChannelId='" + i + "' class='windowAction' targetWindow='window_editGenericPresetChannel'>Channel " + (i+1) + "</li>";
+                }
+                genericPresetChannelList.html(genericPresetChannelHtml);
+            } else {
+                genericPresetChannelList.html("<li>Channel list empty</li>");
+            }
+
+            // List contains windowActions, rebind those
+            rebindWindowActions();
+        }
+
+        function initializeEditGenericPresetChannel(genericPresetId, genericPresetChannelId) {
+            // Get generic preset channel
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            var genericPresetChannel = config.presets.generic[genericPresetId].channels[genericPresetChannelId];
+
+
+            $('#ipGenericPresetChannelBrightness').val(genericPresetChannel.bri);
+            $('#ipGenericPresetChannelHue').val(genericPresetChannel.hue);
+            $('#ipGenericPresetChannelSaturation').val(genericPresetChannel.sat);
+
+
+            $('#btSaveGenericPresetChannel').attr('genericPresetId', genericPresetId);
+
+            $('#btSaveGenericPresetChannel').click(function() {
+                config.presets.generic[genericPresetId].channels[genericPresetChannelId].bri = $('#ipGenericPresetChannelBrightness').val();
+                config.presets.generic[genericPresetId].channels[genericPresetChannelId].hue = $('#ipGenericPresetChannelHue').val();
+                config.presets.generic[genericPresetId].channels[genericPresetChannelId].sat = $('#ipGenericPresetChannelSaturation').val();
+
+                window.localStorage.lampConfiguration = JSON.stringify(config);
+            });
+
+
+            $('#btDeleteGenericPresetChannel').attr('genericPresetId', genericPresetId);
+
+            // Bind this separate from windowActions, can't derive this from the targetWindow..
+            $('#btDeleteGenericPresetChannel').click(function() {
+                config.presets.generic[genericPresetId].channels.splice(genericPresetChannelId, 1);
+
+                window.localStorage.lampConfiguration = JSON.stringify(config);
+            });
+
+            rebindWindowActions();
+        }
 
         function rebindGroups() {
             // Load groups from the config (if there are any)
