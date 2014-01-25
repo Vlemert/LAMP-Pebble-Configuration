@@ -51,13 +51,13 @@
         </div>
     </div>
 
-    <div id="window_lights" class="window" parentWindow="window_mainMenu">
+    <div id="window_lights" class="window" onLoad="window_lights_load" parentWindow="window_mainMenu">
         <ul id="lightsList" class="lamps">
             <li>Loading...</li>
         </ul>
     </div>
 
-    <div id="window_connection" class="window" parentWindow="window_mainMenu">
+    <div id="window_connection" class="window" onLoad="window_connection_load" parentWindow="window_mainMenu">
         <div class="separator">
             Connection info
         </div>
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <div id="window_groups" class="window" parentWindow="window_mainMenu">
+    <div id="window_groups" class="window" onLoad="window_groups_load" parentWindow="window_mainMenu">
         <ul id="groupList" class="groups">
             <li>Loading...</li>
         </ul>
@@ -93,7 +93,7 @@
         </div>
     </div>
 
-    <div id="window_editGroupLights" class="window" parentWindow="window_groups">
+    <div id="window_editGroupLights" class="window" onLoad="window_editGroupLights_load" parentWindow="window_groups">
         <div class="separator">
             In this group (click to remove)
         </div>
@@ -108,7 +108,7 @@
         </ul>
     </div>
 
-    <div id="window_presets" class="window" parentWindow="window_mainMenu">
+    <div id="window_presets" class="window" onload="window_presets_load" parentWindow="window_mainMenu">
         <div class="separator">
             Generic presets
         </div>
@@ -135,7 +135,7 @@
         </div>
     </div>
 
-    <div id="window_editGenericPreset" class="window" parentWindow="window_presets">
+    <div id="window_editGenericPreset" class="window" onLoad="window_editGenericPreset_load" parentWindow="window_presets">
         <div class="separator">
             Edit generic preset
         </div>
@@ -154,12 +154,12 @@
         <div class="separator">
             Actions
         </div>
-        <div class="menuItem windowAction" id="btDeleteGenericPreset" targetWindow="window_presets">
+        <div class="menuItem clickable" id="button_deleteGenericPreset" action="button_deleteGenericPreset_click" targetWindow="window_presets">
             Delete preset
         </div>
     </div>
 
-    <div id="window_editGenericPresetChannel" class="window">
+    <div id="window_editGenericPresetChannel" onLoad="window_editGenericPresetChannel_load" class="window">
         <div class="separator">
             Brightness
         </div>
@@ -187,7 +187,7 @@
         <div class="separator">
             Actions
         </div>
-        <div class="menuItem windowAction" id="btSaveGenericPresetChannel" targetWindow="window_editGenericPreset">
+        <div class="menuItem clickable" id="button_saveGenericPresetChannel" action="button_saveGenericPresetChannel_click" targetWindow="window_editGenericPreset">
             Save changes
         </div>
         <div class="menuItem">
@@ -196,7 +196,7 @@
         <div class="menuItem">
             Copy a channel
         </div>
-        <div class="menuItem windowAction" id="btDeleteGenericPresetChannel" targetWindow="window_editGenericPreset">
+        <div class="menuItem clickable" id="button_deleteGenericPresetChannel" action="button_deleteGenericPresetChannel_click" targetWindow="window_editGenericPreset">
             Delete channel
         </div>
     </div>
@@ -206,37 +206,37 @@
     </div>
 
     <div id="window_mainMenu" class="window">
-        <div class="menuItem windowAction" id="menuItem_lights" targetWindow="window_lights">
+        <div class="menuItem clickable" targetWindow="window_lights">
             <div class="menuArrow">
                 >
             </div>
             Lights
         </div>
-        <div class="menuItem windowAction" id="menuItem_groups" targetWindow="window_groups">
+        <div class="menuItem clickable" targetWindow="window_groups">
             <div class="menuArrow">
                 >
             </div>
             Groups
         </div>
-        <div class="menuItem windowAction" targetWindow="window_blueprints">
+        <div class="menuItem clickable" targetWindow="window_blueprints">
             <div class="menuArrow">
                 >
             </div>
             Blueprints
         </div>
-        <div class="menuItem windowAction" targetWindow="window_presets">
+        <div class="menuItem clickable" targetWindow="window_presets">
             <div class="menuArrow">
                 >
             </div>
             Presets
         </div>
-        <div class="menuItem windowAction" id="menuItem_connection" targetWindow="window_connection">
+        <div class="menuItem clickable" targetWindow="window_connection">
             <div class="menuArrow">
                 >
             </div>
             Connection
         </div>
-        <div class="menuItem" id="menuItem_save">
+        <div class="menuItem clickable" action="save_settings" >
             <div class="menuArrow">
                 >
             </div>
@@ -290,81 +290,164 @@
             }
         });
 
-        function rebindWindowActions() {
-            // Centralized windowAction button handler
+
+        // Centralized clickable handler
+        // - Opens targetWindows
+        // - Runs targetWindow onLoad functions
+        // - Calls clickable actions
+        function rebindClickables(parent) {
+            if (!parent) parent = $('body');
 
             // First remove click handlers, otherwise the app slows down
-            $('.windowAction').unbind( "click" );
+            $('.clickable', parent).unbind('click');
 
-            $('.windowAction').click(function() {
-                // Hide all windows
-                $('.window').removeClass('current');
-
-                // Find and show the target
-                var targetName = $(this).attr('targetWindow');
-                var target = $('#' + targetName);
-                target.addClass('current');
-
-                switch(targetName)
-                {
-                    case "window_lights":
-                        loadLights();
-                        break;
-                    case "window_groups":
-                        rebindGroups();
-                        break;
-                    case "window_connection":
-                        $('#lblConnectionIP').html(JSON.parse(window.localStorage.lampConfiguration).bridgeIp);
-                        getLights(function(e) {
-                            locatedLights = JSON.parse(e);
-                            $('#lblConnectionLightCount').html(Object.keys(locatedLights).length);
-                        });
-                        break;
-                    case "window_editGroupLights":
-                        var parent = $(this).closest('li');
-
-                        getLights(function(e) {
-                            var allLights = JSON.parse(e);
-
-                            var groupId = parent.attr('groupId');
-
-                            rebindGroupLights(allLights, groupId);
-                        });
-                        break;
-                    case "window_presets":
-                        rebindGenericPresets();
-                        break;
-                    case "window_editGenericPreset":
-                        var sender = $(this);
-                        var genericPresetId = sender.attr('genericPresetId');
-
-                        initializeEditGenericPreset(genericPresetId);
-                        break;
-                    case "window_editGenericPresetChannel":
-                        var sender = $(this);
-                        var genericPresetId = sender.attr('genericPresetId');
-                        var genericPresetChannelId = sender.attr('genericPresetChannelId');
-
-                        initializeEditGenericPresetChannel(genericPresetId, genericPresetChannelId);
-                        break;
-                    default:
-                    // Do nothing..
+            // Rebind click action
+            $('.clickable', parent).click(function() {
+                // If the clickable has an action, call that action
+                var action = $(this).attr('action');
+                if (action) {
+                    // Send the caller as event argument
+                    window[action]($(this));
                 }
 
-                // Get the target's parent, if there is one, show the back arrow
-                var parentWindow = target.attr('parentWindow');
-                if (parentWindow) {
-                    $('#backArrow').show();
-                } else {
-                    $('#backArrow').hide();
+                // If the clickable has a target window, show that window
+                var targetWindow = $(this).attr('targetWindow');
+                if (targetWindow) {
+                    // Find the target
+                    var target = $('#' + targetWindow);
+
+                    // If the targetWindow has an onLoad action, call that action
+                    var onLoad = target.attr('onLoad');
+                    if (onLoad) {
+                        // Send the caller as event argument
+                        window[onLoad]($(this));
+                    }
+
+                    // Hide all windows
+                    $('.window').removeClass('current');
+
+                    // If the targetWindow has a parent, show the back arrow
+                    var targetParent = target.attr('parentWindow');
+                    if (targetParent) {
+                        $('#backArrow').show();
+                    } else {
+                        $('#backArrow').hide();
+                    }
+
+                    // Show the target
+                    target.addClass('current');
                 }
             });
         }
 
-        $('#menuItem_save').click(function() {
+        function window_editGenericPresetChannel_load(e) {
+            var sender = e;
+            var genericPresetId = sender.attr('genericPresetId');
+            var genericPresetChannelId = sender.attr('genericPresetChannelId');
+
+            initializeEditGenericPresetChannel(genericPresetId, genericPresetChannelId);
+        }
+
+        function window_editGenericPreset_load(e) {
+            var sender = e;
+            var genericPresetId = sender.attr('genericPresetId');
+
+            initializeEditGenericPreset(genericPresetId);
+        }
+
+        function window_editGroupLights_load(e) {
+            var parent = e.closest('li');
+
+            getLights(function(e) {
+                var allLights = JSON.parse(e);
+
+                var groupId = parent.attr('groupId');
+
+                rebindGroupLights(allLights, groupId);
+            });
+        }
+
+        function window_connection_load(e) {
+            $('#lblConnectionIP').html(JSON.parse(window.localStorage.lampConfiguration).bridgeIp);
+            getLights(function(e) {
+                locatedLights = JSON.parse(e);
+                $('#lblConnectionLightCount').html(Object.keys(locatedLights).length);
+            });
+        }
+
+        function window_presets_load(e) {
+            rebindGenericPresets();
+        }
+
+        function window_groups_load(e) {
+            rebindGroups();
+        }
+
+        function window_lights_load(e) {
+            getLights(function(e) {
+                locatedLights = JSON.parse(e);
+
+                var lightListHtml = "";
+
+                for (i = 1; i < 50; i++) {
+                    if (locatedLights[i] == null) {
+                        break;
+                    }
+                    lightListHtml += "<li lightid='" + i + "'><div class='rename'>rename</div><div class='save startHidden'>save</div><span class='label'>" + locatedLights[i].name + "</span><div class='fieldContainer'><input type='text' class='field startHidden' /></div></li>";
+                }
+
+                $('#lightsList').html(lightListHtml);
+
+                $('.rename').click(function() {
+                    var parent = $(this).closest('li');
+                    $('.rename').hide();
+                    $('.save', parent).show();
+
+                    var label = $('.label', parent);
+                    var field = $('.field', parent);
+                    label.hide();
+                    field.show();
+                    field.val(label.text());
+                    field.focus();
+
+                    // start blinking the light
+                    var lightid = parent.attr('lightid');
+                    blinkLight(lightid, function(e) {
+
+                    });
+                });
+
+                $('.save').click(function() {
+                    var parent = $(this).closest('li');
+                    $('.rename').show();
+                    $('.save', parent).hide();
+
+                    var label = $('.label', parent);
+                    var field = $('.field', parent);
+                    label.show();
+                    field.hide();
+                    label.text(field.val());
+
+
+                    var lightid = parent.attr('lightid');
+                    renameLight(lightid, field.val(), function(e) {
+
+                    });
+
+
+                    // stop blinking the light
+                    stopBlinkLight(lightid, function(e) {
+
+                    });
+                });
+            });
+        }
+
+
+        function save_settings(e) {
             // Return config to pebble js
             window.location.href = "pebblejs://close#" + encodeURIComponent(JSON.stringify(window.localStorage.lampConfiguration));
-        });
+        }
 
         function rebindGenericPresets() {
             // Load generic presets from the config (if there are any)
@@ -373,15 +456,15 @@
             if (config.presets && config.presets.generic && config.presets.generic.length > 0) {
                 var genericPresetsHtml = "";
                 for (i = 0; i < config.presets.generic.length; i++) {
-                    genericPresetsHtml += "<li genericPresetId='" + i + "' class='windowAction' targetWindow='window_editGenericPreset'>" + config.presets.generic[i].name + "</li>";
+                    genericPresetsHtml += "<li genericPresetId='" + i + "' class='clickable' targetWindow='window_editGenericPreset'>" + config.presets.generic[i].name + "</li>";
                 }
                 genericPresetsList.html(genericPresetsHtml);
             } else {
                 genericPresetsList.html("<li>Preset list empty</li>");
             }
 
-            // List contains windowActions, rebind those
-            rebindWindowActions();
+            // List contains clickables, rebind those
+            rebindClickables(genericPresetsList);
         }
 
         $('#addNewGenericPreset').click(function() {
@@ -440,14 +523,19 @@
                 rebindGenericPresetChannels(genericPresetId);
             });
 
-            // Bind this separate from windowActions, can't derive this from the targetWindow..
-            $('#btDeleteGenericPreset').click(function() {
-                config.presets.generic.splice(genericPresetId, 1);
+            $('#button_deleteGenericPreset').attr('genericPresetId', genericPresetId);
 
-                window.localStorage.lampConfiguration = JSON.stringify(config);
-            })
+            rebindClickables($('#window_editGenericPreset'));
+        }
 
-            rebindWindowActions();
+        function button_deleteGenericPreset_click(e) {
+            var genericPresetId = e.attr('genericPresetId');
+
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            config.presets.generic.splice(genericPresetId, 1);
+
+            window.localStorage.lampConfiguration = JSON.stringify(config);
         }
 
         function rebindGenericPresetChannels(genericPresetId) {
@@ -457,15 +545,15 @@
             if (config.presets.generic[genericPresetId].channels.length > 0) {
                 var genericPresetChannelHtml = "";
                 for (i = 0; i < config.presets.generic[genericPresetId].channels.length; i++) {
-                    genericPresetChannelHtml += "<li genericPresetId='" + genericPresetId + "' genericPresetChannelId='" + i + "' class='windowAction' targetWindow='window_editGenericPresetChannel'>Channel " + (i+1) + "</li>";
+                    genericPresetChannelHtml += "<li genericPresetId='" + genericPresetId + "' genericPresetChannelId='" + i + "' class='clickable' targetWindow='window_editGenericPresetChannel'>Channel " + (i+1) + "</li>";
                 }
                 genericPresetChannelList.html(genericPresetChannelHtml);
             } else {
                 genericPresetChannelList.html("<li>Channel list empty</li>");
             }
 
-            // List contains windowActions, rebind those
-            rebindWindowActions();
+            // List contains clickables, rebind those
+            rebindClickables(genericPresetChannelList);
         }
 
         function initializeEditGenericPresetChannel(genericPresetId, genericPresetChannelId) {
@@ -474,33 +562,41 @@
 
             var genericPresetChannel = config.presets.generic[genericPresetId].channels[genericPresetChannelId];
 
-
             $('#ipGenericPresetChannelBrightness').val(genericPresetChannel.bri);
             $('#ipGenericPresetChannelHue').val(genericPresetChannel.hue);
             $('#ipGenericPresetChannelSaturation').val(genericPresetChannel.sat);
 
+            $('#button_saveGenericPresetChannel').attr('genericPresetId', genericPresetId);
+            $('#button_saveGenericPresetChannel').attr('genericPresetChannelId', genericPresetChannelId);
 
-            $('#btSaveGenericPresetChannel').attr('genericPresetId', genericPresetId);
+            $('#button_deleteGenericPresetChannel').attr('genericPresetId', genericPresetId);
+            $('#button_deleteGenericPresetChannel').attr('genericPresetChannelId', genericPresetChannelId);
 
-            $('#btSaveGenericPresetChannel').click(function() {
-                config.presets.generic[genericPresetId].channels[genericPresetChannelId].bri = $('#ipGenericPresetChannelBrightness').val();
-                config.presets.generic[genericPresetId].channels[genericPresetChannelId].hue = $('#ipGenericPresetChannelHue').val();
-                config.presets.generic[genericPresetId].channels[genericPresetChannelId].sat = $('#ipGenericPresetChannelSaturation').val();
+            rebindClickables($('#window_editGenericPresetChannel'));
+        }
 
-                window.localStorage.lampConfiguration = JSON.stringify(config);
-            });
+        function button_deleteGenericPresetChannel_click(e) {
+            var genericPresetId = e.attr('genericPresetId');
+            var genericPresetChannelId = e.attr('genericPresetChannelId');
 
+            var config = JSON.parse(window.localStorage.lampConfiguration);
 
-            $('#btDeleteGenericPresetChannel').attr('genericPresetId', genericPresetId);
+            config.presets.generic[genericPresetId].channels.splice(genericPresetChannelId, 1);
 
-            // Bind this separate from windowActions, can't derive this from the targetWindow..
-            $('#btDeleteGenericPresetChannel').click(function() {
-                config.presets.generic[genericPresetId].channels.splice(genericPresetChannelId, 1);
+            window.localStorage.lampConfiguration = JSON.stringify(config);
+        }
 
-                window.localStorage.lampConfiguration = JSON.stringify(config);
-            });
+        function button_saveGenericPresetChannel_click(e) {
+            var genericPresetId = e.attr('genericPresetId');
+            var genericPresetChannelId = e.attr('genericPresetChannelId');
 
-            rebindWindowActions();
+            var config = JSON.parse(window.localStorage.lampConfiguration);
+
+            config.presets.generic[genericPresetId].channels[genericPresetChannelId].bri = $('#ipGenericPresetChannelBrightness').val();
+            config.presets.generic[genericPresetId].channels[genericPresetChannelId].hue = $('#ipGenericPresetChannelHue').val();
+            config.presets.generic[genericPresetId].channels[genericPresetChannelId].sat = $('#ipGenericPresetChannelSaturation').val();
+
+            window.localStorage.lampConfiguration = JSON.stringify(config);
         }
 
         function rebindGroups() {
@@ -509,7 +605,7 @@
             if (config.groups && config.groups.length > 0) {
                 var groupsHtml = "";
                 for (i = 0; i < config.groups.length; i++) {
-                    groupsHtml += "<li groupId='" + i + "'><div class='windowAction editlights' targetWindow='window_editGroupLights'>L</div><div class='delete'>X</div>" + config.groups[i].name + "</li>";
+                    groupsHtml += "<li groupId='" + i + "'><div class='clickable editlights' targetWindow='window_editGroupLights'>L</div><div class='delete'>X</div>" + config.groups[i].name + "</li>";
                 }
                 $('#groupList').html(groupsHtml);
             } else {
@@ -527,7 +623,7 @@
                 rebindGroups();
             });
 
-            rebindWindowActions();
+            rebindClickables($('#groupList'));
         }
 
         function rebindGroupLights(allLights, groupId) {
@@ -640,66 +736,6 @@
             $('#window_connection').hide();
         });
 
-        function loadLights() {
-            getLights(function(e) {
-                locatedLights = JSON.parse(e);
-
-                var lightListHtml = "";
-
-                for (i = 1; i < 50; i++) {
-                    if (locatedLights[i] == null) {
-                        break;
-                    }
-                    lightListHtml += "<li lightid='" + i + "'><div class='rename'>rename</div><div class='save startHidden'>save</div><span class='label'>" + locatedLights[i].name + "</span><div class='fieldContainer'><input type='text' class='field startHidden' /></div></li>";
-                }
-
-                $('#lightsList').html(lightListHtml);
-
-                $('.rename').click(function() {
-                    var parent = $(this).closest('li');
-                    $('.rename').hide();
-                    $('.save', parent).show();
-
-                    var label = $('.label', parent);
-                    var field = $('.field', parent);
-                    label.hide();
-                    field.show();
-                    field.val(label.text());
-                    field.focus();
-
-                    // start blinking the light
-                    var lightid = parent.attr('lightid');
-                    blinkLight(lightid, function(e) {
-
-                    });
-                });
-
-                $('.save').click(function() {
-                    var parent = $(this).closest('li');
-                    $('.rename').show();
-                    $('.save', parent).hide();
-
-                    var label = $('.label', parent);
-                    var field = $('.field', parent);
-                    label.show();
-                    field.hide();
-                    label.text(field.val());
-
-
-                    var lightid = parent.attr('lightid');
-                    renameLight(lightid, field.val(), function(e) {
-
-                    });
-
-
-                    // stop blinking the light
-                    stopBlinkLight(lightid, function(e) {
-
-                    });
-                });
-            });
-        }
-
         $('#backArrow').click(function() {
             // Get the current window
             var currentWindow = $('.window.current');
@@ -772,7 +808,7 @@
         //document.getElementById("textLabel").innerText = window.localStorage.lampConfiguration;
 
 
-        rebindWindowActions();
+        rebindClickables();
     </script>
 </body>
 
