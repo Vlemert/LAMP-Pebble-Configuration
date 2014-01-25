@@ -292,6 +292,10 @@
 
         function rebindWindowActions() {
             // Centralized windowAction button handler
+
+            // First remove click handlers, otherwise the app slows down
+            $('.windowAction').unbind( "click" );
+
             $('.windowAction').click(function() {
                 // Hide all windows
                 $('.window').removeClass('current');
