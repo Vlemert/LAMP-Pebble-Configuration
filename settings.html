@@ -446,7 +446,7 @@
 
         function save_settings(e) {
             // Return config to pebble js
-            window.location.href = "pebblejs://close#" + encodeURIComponent(JSON.stringify(window.localStorage.lampConfiguration));
+            window.location.href = "pebblejs:///close#" + encodeURIComponent(window.localStorage.lampConfiguration);
         }
 
         function rebindGenericPresets() {
